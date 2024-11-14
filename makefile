@@ -1,3 +1,3 @@
-all: $(prog).c
-	gcc ./src/$(prog).c -o ./bin/$(prog).exe;
-	./bin/$(prog).exe;
+all:
+	gcc ./src/lcs.c -o ./bin/lcs.exe;
+	./bin/lcs.exe;
