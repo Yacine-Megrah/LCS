@@ -3,8 +3,16 @@
 #include <string.h>
 #include <time.h>
 
-double get_time(clock_t start, clock_t end){
-    return (double)(end - start)/CLOCKS_PER_SEC;
+double get_time(char *X, int m, char *Y, int n, int (*func)(char*,int,char*,int)){
+    clock_t end, start;
+    double total_time = 0;
+    for(int i = 0; i < 4 ; i++){
+        start = clock();
+        func(X, m, Y, n);
+        end = clock();
+        total_time += (double)(end-start)/CLOCKS_PER_SEC;
+    }
+    return total_time/4;
 }
 
 int max(int x, int y){
@@ -80,33 +88,39 @@ int lcs_dynamic_space_optimized(char *X, int m, char *Y, int n){
 
 int main() {
 
-    const char * strings[] = {
-/*10 */ {"WWVBUJOFST","BUMJAZGBVD"},
-/*20 */ {"ZOYMFAPTUURZ ASOKEGDHF","HZDGEQHDPKXPQKQOFTBD"},
-/*40 */ {"LJMYKYLXICGLBD GOZGYQSDZLG XOMRRZASUWYGZAINY","DJIKDEZYDNWNJIB FRPGJEVJWIBJGWVCQ VMVTQQ"},
-/*80 */ {"PMOOFU  FQPKLXETDOVTXVMVVXSJYDKFWAPKDDQBFTXTVSXZLMTZDCKIOAZPIQNGWJG IBVGKPZAI FO","ZWCJUGABHTPBEUJMDLSBKBTGIQSRMBJUERWDDIMVJQVKNJQ FNBQEJRSIDNYCPRZSNKEAMZZFNFHNSVMWD"},
-/*160*/ {"LI ZCQPLYGILTJJQMVWQERVMHEOKJWBKDSJKCMDGJDLUAMZILAKOR NABMNNMNGJOH GQSRXULOATMNOLNZOLEQTWYTPPLXMKKNYMXCHHHAPYAWILWDCYCNMTW BCWXURVCJOTMRLFNGRXFDXEEMGFROKCERYL","QRDDZWUVZSITMRXQDDMONDLGBDXPTFRHYTH GFGLHDWS AGWGAFFVTDPOYIOHTVNRHRWFGLGSOWPLHVVA ACCAYGRSWOWYBDUBVAU SPYTKWSFDS HMWVMSFHSUJHEULYTPEUQ XFCLQJDTIDKVLJDBW RZYTGZ"}
+    char *strings[5][2] = {
+/*4*/   {"ABFC","ABCF"},
+/*10 */ {"JTDLFOEZVJ","ALZITNAKOQ"},
+/*16 */ {"WTU XCNWLEWFHHDB","KEAJNHFUTQWTJGGOXI"},
+/*22 */ {"VQIQGHLSYXUSISSKNM QAPZMEMLYHJ T","XCOJTVRKGHVO VMTFNMVEEGQLA EXQGJ"},
+//*40 */ {"GVIQTOASIIIDUHPRZSBPCUFGVDLWYY QNCEKQBDFBQMM","PRMSBQNJIJHWGKUSGPIOSUFLHNYCFXEDYPKNVXUY"},
+//*50 */ {"ABMVQBPGJTTYBOEQGCLAOBCMAWDPUJPQETTSJBJUBKXUACSWQFLFIYQOCNIT","RYXCVWSTDSJEJJ VAQMNKOSUOSTPLQRD YQFGPIY GUG FRPPVHNSBVOWLYXYMXP"}
     };
 
-    clock_t start_time, end_time;
-    double elapsed_time;
-    FILE *results_f;
-
-    results_f = fopen("results.tsv", "w+");
+    double times[5][4];
+    FILE *results_f = fopen("results.tsv", "w+");
     fprintf(results_f, "n,m\tlcs_recursive\tlcs_memoization\tlcs_dynamic_so\n");
     fflush(results_f);
 
-    char X[] = "AGGT AB";
-    char Y[] = "GXT XAY B";
-    int m = strlen(X);
-    int n = strlen(Y);
-
-
-    printf("Length of LCS (recursive) is %d\n", lcs_recursive(X, m, Y, n));
-
-    printf("Length of LCS (memo) is %d\n", lcs_memo(X, m, Y, n));
-
-    printf("Length of LCS (so) is %d\n", lcs_dynamic_space_optimized(X, m, Y, n));
+    for(int i=0; i < 5; i++){
+        times[i][0] = strlen(strings[i][0]);
+        times[i][1] = get_time(strings[i][0], strlen(strings[i][0]), strings[i][1], strlen(strings[i][1]), lcs_recursive);
+        times[i][2] = get_time(strings[i][0], strlen(strings[i][0]), strings[i][1], strlen(strings[i][1]), lcs_memo);
+        times[i][3] = get_time(strings[i][0], strlen(strings[i][0]), strings[i][1], strlen(strings[i][1]), lcs_dynamic_space_optimized);
+        fprintf(results_f, "%d\t%.3f\t%.3f\t%.3f\n", (int)times[i][0], times[i][1], times[i][2], times[i][3]);
+    }
+ 
+    fclose(results_f);
 
     return 0;
 }
+    // char X[] = "AGGT AB";
+    // char Y[] = "GXT XAY B";
+    // int m = strlen(X);
+    // int n = strlen(Y);
+
+    // printf("Length of LCS (recursive) is %d\n", lcs_recursive(X, m, Y, n));
+
+    // printf("Length of LCS (memo) is %d\n", lcs_memo(X, m, Y, n));
+
+    // printf("Length of LCS (so) is %d\n", lcs_dynamic_space_optimized(X, m, Y, n));

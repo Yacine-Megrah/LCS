@@ -1,0 +1,4 @@
+n,m	lcs_recursive	lcs_memoization	lcs_dynamic_so
+4	0.000	0.000	0.000
+10	0.001	0.000	0.000
+16	4.322	0.000	0.000
